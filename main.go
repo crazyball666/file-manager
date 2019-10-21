@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"os"
-	"server_demo/controller"
-	"server_demo/util"
+	"file-manger-go/controller"
+	"file-manger-go/util"
 
 	"github.com/gin-gonic/gin"
 )

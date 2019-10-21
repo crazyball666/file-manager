@@ -8,7 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"server_demo/util"
+	"file-manger-go/util"
 
 	"github.com/gin-gonic/gin"
 )
