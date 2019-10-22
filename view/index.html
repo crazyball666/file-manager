@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Index</title>
-  <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="/static/common-resouce/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/file-manager-go/css/main.css">
 </head>
 
 <body>
@@ -14,9 +14,9 @@
     <div class="dir-item">
       <!-- <img class="item-more" src="static/img/more.png" alt=""> -->
       {{if $dir.is_dir}}
-      <img class="item-img" src="/static/img/dir.jpg" alt="">
+      <img class="item-img" src="/static/file-manager-go/img/dir.jpg" alt="">
       {{ else }}
-      <img class="item-img" src="/static/img/file.jpg" alt="">
+      <img class="item-img" src="/static/file-manager-go/img/file.jpg" alt="">
       {{ end }}
       <p class="item-title">{{$dir.name}}</p>
       {{if not $dir.is_dir}}
@@ -31,7 +31,7 @@
     </div>
     {{end}}
     <label class="dir-item upload-item" for="upload-input">
-      <img class="upload-img" src="/static/img/upload.png" alt="">
+      <img class="upload-img" src="/static/file-manager-go/img/upload.png" alt="">
       <p class="upload-title">上传</p>
       <input type="file" id="upload-input" multiple>
     </label>
@@ -40,8 +40,8 @@
 </body>
 
 
-<script src="/static/jquery/jquery.min.js"></script>
-<script src="/static/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/js/main.js"></script>
+<script src="/static/common-resouce/jquery/jquery.min.js"></script>
+<script src="/static/common-resouce/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/file-manager-go/js/main.js"></script>
 
 </html>
