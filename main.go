@@ -1,11 +1,11 @@
 package main
 
 import (
+	"file-manager/controller"
+	"file-manager/util"
 	"fmt"
 	"html/template"
 	"os"
-	"file-manger-go/controller"
-	"file-manger-go/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +34,7 @@ func main() {
 
 	app.POST("/upload", controller.Upload)
 	app.POST("/mkdir", controller.CreateDir)
-	app.DELETE("/remove", controller.Delete)
+	app.POST("/remove", controller.Delete)
 	app.Use(controller.Index)
 	app.Run(util.ServerPort)
 }

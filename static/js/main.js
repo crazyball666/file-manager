@@ -1,33 +1,46 @@
 $(function () {
   $(".detail-btn").on('click', function (event) {
     event.preventDefault();
-    let fenge = "/"
-    if (location.pathname == "/") {
-      fenge = ""
+    // location.href = location.origin + $(this).attr("attr-href");
+    if($(this).attr("attr-isDir")=="true"){
+      console.log(location.origin , $(this).attr("attr-href"))
+      location.href = location.origin + $(this).attr("attr-href");
+      return
     }
-    location.href = location.pathname + fenge + $(this).attr("attr-href");
+    if($(this).attr("attr-isImg")=="true") {
+      $(".img-content").attr("src",location.origin + $(this).attr("attr-href"))
+      $(".img-view").fadeIn();
+
+      return
+    }
+    $.get(location.origin + $(this).attr("attr-href"),function (data) {
+      $(".file-view").fadeIn();
+      $(".content-view").text(data)
+    })
   });
 
-  $("#upload-input").on("change", function (event) {
-    let formData = new FormData();
-    for(let i=0;i<$(this)[0].files.length;i++){
-      formData.append("files", $(this)[0].files[i]);
-    }
-    formData.append("uploadPath", location.pathname);
-    $.ajax({
-      url: '/upload', /*接口域名地址*/
-      type: 'post',
-      data: formData,
-      contentType: false,
-      processData: false,
-      success: function (res) {
-        console.log(res);
-        if (res["code"] == 200) {
-          alert('成功');
-        } else {
-          alert('失败');
-        }
-      }
-    })
+  $(".img-view").on("click",function () {
+    $(this).fadeOut()
   })
+
+  $(".close-btn").on("click",function () {
+    $(this).parent().fadeOut();
+  })
+
+  $("#upload-input").on("change", function (event) {
+    $(".upload-form").submit()
+  })
+
+  $(".create-item").on("click",function () {
+    $(".create-view").fadeIn()
+  })
+
+  $(".delete-btn").on("click",function () {
+    var form = $("<form action='/remove' method='post'></form>")
+    form.append("<input type='hidden' name='basePath' value='" + $(this).attr("attr-basePath") +"'>");
+    form.append("<input type='hidden' name='fileName' value='" + $(this).attr("attr-fileName") +"'>");
+    $(document.body).append(form);
+    form.submit();
+  })
+
 })

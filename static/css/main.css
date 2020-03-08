@@ -1,9 +1,12 @@
 p{
   margin: 0;
 }
+/*body{*/
+/*  padding: 20px;*/
+/*}*/
 .box{
   width: 960px;
-  margin: 0 auto;
+  margin: 30px auto;
   border: 1px solid #ccc;
   padding: 30px;
   border-radius: 15px;
@@ -75,26 +78,114 @@ p{
   cursor: pointer;
 }
 .detail-btn{
-  background: rgb(60, 60, 205);
+  background: rgb(22, 159, 205);
 }
 .delete-btn{
-  background: rgb(205, 60, 60);
+  background: rgb(205, 79, 63);
 }
 .download-btn{
-  background: rgb(60, 205, 60);
+  background: rgb(86, 205, 88);
 }
-.upload-item{
+.upload-item,.create-item{
   cursor: pointer;
 }
 #upload-input{
   display: none;
 }
-.upload-img{
+.upload-img,.create-img{
   width: 50px;
   height: 50px;
-  margin: 50px auto 10px;
+  margin: 60px auto 10px;
 }
-.upload-title{
+.upload-title,.create-title{
   font-size: 14px;
   font-weight: bold;
+}
+
+
+/*预览*/
+.file-view{
+  position: fixed;
+  width: 800px;
+  height: 80vh;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  padding: 50px;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 0 10px 3px #666;
+}
+
+.close-btn{
+  position: absolute;
+  z-index: 99;
+  width: 24px;
+  height: 24px;
+  background: #c9302c;
+  top: 10px;
+  right: 10px;
+  border-radius: 50%;
+}
+
+.content-view{
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+  white-space: pre-line;
+}
+
+.img-view{
+  position: fixed;
+  background: rgba(60,60,60,0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.img-content{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  max-height: 80vh;
+  max-width: 80vw;
+}
+
+.create-view{
+  position: fixed;
+  width: 350px;
+  height: 160px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  padding: 50px;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 0 10px 3px #666;
+}
+
+.create-input{
+  width: 100%;
+  height: 30px;
+}
+
+.create-btn{
+  display: block;
+  margin: 20px auto;
+  width: 80px;
+  height: 32px;
+  background: #5bc0de;
+  border-radius: 16px;
+  color: #ffffff;
 }

@@ -4,44 +4,68 @@
 <head>
   <meta charset="UTF-8">
   <title>Index</title>
-  <link rel="stylesheet" href="/static/common-resouce/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/file-manager-go/css/main.css">
+  <link rel="stylesheet" href="/static/css/main.css">
 </head>
 
 <body>
   <div class="box">
     {{range $i,$dir := .dirList}}
     <div class="dir-item">
-      <!-- <img class="item-more" src="static/img/more.png" alt=""> -->
       {{if $dir.is_dir}}
-      <img class="item-img" src="/static/file-manager-go/img/dir.jpg" alt="">
+      <img class="item-img" src="/static/img/dir.png" alt="">
+      {{else if $dir.is_img}}
+        <img class="item-img" src="{{$dir.path}}">
       {{ else }}
-      <img class="item-img" src="/static/file-manager-go/img/file.jpg" alt="">
+      <img class="item-img" src="/static/img/file.png" alt="">
       {{ end }}
       <p class="item-title">{{$dir.name}}</p>
       {{if not $dir.is_dir}}
       <p class="item-size">Size: {{$dir.size | formatFileSize}}</p>
       {{end}}
-      <p class="item-time">修改时间：{{$dir.modify_time | formatTime}}</p>
+      <p class="item-time">{{$dir.modify_time | formatTime}}</p>
       <div class="item-more-view">
-        <a class="detail-btn more-btn" attr-href="{{$dir.name}}">查看</a>
-        <a class="download-btn more-btn" href="">下载</a>
-        <a class="delete-btn more-btn" href="">删除</a>
+        <a class="detail-btn more-btn" attr-href="{{$dir.path}}" attr-isDir="{{$dir.is_dir}}" attr-isImg="{{$dir.is_img}}">查看</a>
+        {{if not $dir.is_dir}}
+        <a class="download-btn more-btn" href="{{$dir.path}}">下载</a>
+        {{end}}
+        <a class="delete-btn more-btn" attr-basePath="{{$.basePath}}" attr-fileName="{{$dir.name}}">删除</a>
       </div>
     </div>
     {{end}}
-    <label class="dir-item upload-item" for="upload-input">
-      <img class="upload-img" src="/static/file-manager-go/img/upload.png" alt="">
-      <p class="upload-title">上传</p>
-      <input type="file" id="upload-input" multiple>
+    <label class="dir-item create-item">
+      <img class="create-img" src="/static/img/add.png" alt="">
+      <p class="create-title">创建文件夹</p>
     </label>
+    <label class="dir-item upload-item" for="upload-input">
+      <img class="upload-img" src="/static/img/upload.png" alt="">
+      <p class="upload-title">上传</p>
+      <form action="/upload" method="post" class="upload-form" enctype="multipart/form-data">
+        <input type="text" value="{{.basePath}}" name="basePath" hidden>
+        <input type="file" id="upload-input" multiple name="files">
+      </form>
+    </label>
+  </div>
+
+  <div class="file-view" hidden>
+    <div class="close-btn"></div>
+    <div class="content-view"></div>
+  </div>
+  <div class="img-view" hidden>
+    <img class="img-content">
+  </div>
+  <div class="create-view" hidden>
+    <div class="close-btn"></div>
+    <form action="/mkdir" method="post" class="mkdir-form">
+      <input type="text" value="{{.basePath}}" name="basePath" hidden>
+      <input class="create-input" type="text" placeholder="输入文件夹名称..." name="dirName">
+      <button class="create-btn" type="submit">创建</button>
+    </form>
   </div>
 
 </body>
 
 
-<script src="/static/common-resouce/jquery/jquery.min.js"></script>
-<script src="/static/common-resouce/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/file-manager-go/js/main.js"></script>
+<script src="/static/jquery/jquery.min.js"></script>
+<script src="/static/js/main.js"></script>
 
 </html>
