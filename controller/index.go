@@ -90,7 +90,6 @@ func CreateDir(c *gin.Context) {
 // 删除文件
 func Delete(c *gin.Context) {
 	defer func() {
-		c.Request.Body.Close()
 		if err := recover(); err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"code":    500,
@@ -103,7 +102,6 @@ func Delete(c *gin.Context) {
 	if len(basePath) == 0 || len(fileName) == 0 {
 		panic("不能为空")
 	}
-	fmt.Println(basePath,fileName)
 	fullPath := path.Join(util.RootPath, basePath,fileName)
 	if err := os.Remove(fullPath); err != nil {
 		panic("删除失败: " + err.Error())

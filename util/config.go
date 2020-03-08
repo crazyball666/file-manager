@@ -2,5 +2,5 @@ package util
 
 var (
 	ServerPort string = ":8080" //端口号
-	RootPath   string = "/Users/crazyball/Desktop"
+	RootPath   string = "/root/crazyball/static"
 )
