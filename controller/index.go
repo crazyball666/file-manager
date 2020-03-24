@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"file-manager/config"
 	"file-manager/util"
 	"fmt"
 	"io/ioutil"
@@ -8,12 +9,13 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Index(c *gin.Context) {
-	path := filepath.Join(util.RootPath, c.Request.URL.Path)
+	path := filepath.Join(config.RootPath, c.Request.URL.Path)
 	fmt.Println(path)
 	info, err := os.Stat(path)
 	if err != nil {
@@ -55,13 +57,47 @@ func Upload(c *gin.Context) {
 		panic("缺少上传文件")
 	}
 	for _, file := range files {
-		filePath := path.Join(util.RootPath, basePath, file.Filename)
+		filePath := path.Join(config.RootPath, basePath, file.Filename)
 		err := c.SaveUploadedFile(file, filePath)
 		if err != nil {
 			panic(fmt.Sprintf("上传文件%s错误", file.Filename))
 		}
 	}
 	c.Redirect(302,basePath)
+}
+
+func UploadFile(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"code":    500,
+				"message": err,
+			})
+		}
+	}()
+	form, _ := c.MultipartForm()
+	files := form.File["files"]
+	if len(files) < 1 {
+		panic("缺少上传文件")
+	}
+	data := make([]string,0)
+	for _, file := range files {
+		now := time.Now()
+		dateStr := now.Format("2006-01-02")
+		fileName := fmt.Sprintf("%d_",now.Unix()) + file.Filename
+		filePath := path.Join(config.StaticPath, config.UploadDirName, dateStr, fileName)
+		err := c.SaveUploadedFile(file, filePath)
+		if err != nil {
+			panic(fmt.Sprintf("上传文件%s错误", file.Filename))
+		}else{
+			data = append(data,path.Join(config.StaticHost,config.UploadDirName,dateStr,fileName))
+		}
+	}
+	c.JSON(http.StatusOK,map[string]interface{}{
+		"code":200,
+		"message":"success",
+		"data":data,
+	})
 }
 
 
@@ -80,7 +116,7 @@ func CreateDir(c *gin.Context) {
 	if len(basePath) == 0 || len(dirName) == 0 {
 		panic("不能为空")
 	}
-	dirPath := path.Join(util.RootPath, basePath,dirName)
+	dirPath := path.Join(config.RootPath, basePath,dirName)
 	if err := os.Mkdir(dirPath, os.ModePerm); err != nil {
 		panic("创建文件夹失败: " + err.Error())
 	}
@@ -102,7 +138,7 @@ func Delete(c *gin.Context) {
 	if len(basePath) == 0 || len(fileName) == 0 {
 		panic("不能为空")
 	}
-	fullPath := path.Join(util.RootPath, basePath,fileName)
+	fullPath := path.Join(config.RootPath, basePath,fileName)
 	if err := os.Remove(fullPath); err != nil {
 		panic("删除失败: " + err.Error())
 	}

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"file-manager/config"
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
@@ -8,7 +9,7 @@ import (
 
 // 读取文件夹
 func ReadDir(dir string) ([]map[string]interface{}, error) {
-	fullPath := filepath.Join(RootPath,dir)
+	fullPath := filepath.Join(config.RootPath,dir)
 	fileInfos, err := ioutil.ReadDir(fullPath)
 	if err != nil {
 		panic("文件夹错误")
