@@ -3,6 +3,7 @@ package util
 import (
 	"file-manager/config"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 )
@@ -30,4 +31,15 @@ func ReadDir(dir string) ([]map[string]interface{}, error) {
 		fileSlice = append(fileSlice, fileMap)
 	}
 	return fileSlice, nil
+}
+
+func Exists(path string) bool {
+	_, err := os.Stat(path)    //os.Stat获取文件信息
+	if err != nil {
+		if os.IsExist(err) {
+			return true
+		}
+		return false
+	}
+	return true
 }

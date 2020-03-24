@@ -81,11 +81,19 @@ func UploadFile(c *gin.Context) {
 		panic("缺少上传文件")
 	}
 	data := make([]string,0)
+
+	now := time.Now()
+	dateStr := now.Format("2006-01-02")
+
+	uploadDir := path.Join(config.StaticPath, config.UploadDirName, dateStr)
+	if !util.Exists(uploadDir) {
+		if err := os.MkdirAll(uploadDir,os.ModePerm);err!=nil{
+			panic("创建文件夹失败")
+		}
+	}
 	for _, file := range files {
-		now := time.Now()
-		dateStr := now.Format("2006-01-02")
 		fileName := fmt.Sprintf("%d_",now.Unix()) + file.Filename
-		filePath := path.Join(config.StaticPath, config.UploadDirName, dateStr, fileName)
+		filePath := path.Join(uploadDir, fileName)
 		err := c.SaveUploadedFile(file, filePath)
 		if err != nil {
 			panic(fmt.Sprintf("上传文件%s错误", file.Filename))
