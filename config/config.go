@@ -6,5 +6,5 @@ var (
 
 	UploadDirName string ="uploads" // 上传文件夹
 	StaticPath string = "/root/crazyball/static" // 静态资源地址
-	StaticHost string = "static.crazyball.xyz/static"
+	StaticHost string = "static.crazyball.xyz"
 )
