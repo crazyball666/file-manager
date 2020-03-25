@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crazyball/go-common/middleware"
 	"file-manager/config"
 	"file-manager/controller"
 	"file-manager/util"
@@ -19,6 +20,9 @@ func main() {
 	}
 
 	app := gin.Default()
+
+	app.Use(middleware.Cors)
+
 	app.Static("/static", "./static")
 
 	app.SetFuncMap(template.FuncMap{
