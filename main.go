@@ -1,7 +1,8 @@
 package main
 
 import (
-	"crazyball/go-common/middleware"
+	commonController "crazyball/go-common/controller"
+	commonMiddleware "crazyball/go-common/middleware"
 	"file-manager/config"
 	"file-manager/controller"
 	"file-manager/util"
@@ -21,7 +22,7 @@ func main() {
 
 	app := gin.Default()
 
-	app.Use(middleware.Cors)
+	app.Use(commonMiddleware.Cors)
 
 	app.Static("/static", "./static")
 
@@ -31,13 +32,16 @@ func main() {
 	})
 	app.LoadHTMLGlob("view/*")
 
+
+	app.GET("/verify", commonController.VerifyTicket)
+
 	app.POST("/api/upload",controller.UploadFile)
 
-	app.POST("/upload", controller.Upload)
-	app.POST("/mkdir", controller.CreateDir)
-	app.POST("/remove", controller.Delete)
+	app.POST("/upload", commonMiddleware.AuthPage(""), controller.Upload)
+	app.POST("/mkdir", commonMiddleware.AuthPage(""), controller.CreateDir)
+	app.POST("/remove", commonMiddleware.AuthPage(""), controller.Delete)
 
-	app.Use(controller.Index)
+	app.Use(commonMiddleware.AuthPage(""),controller.Index)
 
 	app.Run(config.ServerPort)
 }
