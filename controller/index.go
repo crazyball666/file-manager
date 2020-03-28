@@ -20,10 +20,10 @@ func Index(c *gin.Context) {
 	if err != nil {
 		c.String(404,"404 not found");
 	}else if !info.IsDir() {
-		//if c.GetHeader("If-Modified-Since") == fmt.Sprintf("%v",info.ModTime()) {
-		//	c.Status(http.StatusNotModified)
-		//	return;
-		//}
+		if c.GetHeader("If-Modified-Since") == fmt.Sprintf("%v",info.ModTime()) {
+			c.Status(http.StatusNotModified)
+			return;
+		}
 		buf, err := ioutil.ReadFile(path)
 		if err != nil {
 			panic(err.Error())
