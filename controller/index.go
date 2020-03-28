@@ -16,16 +16,20 @@ import (
 
 func Index(c *gin.Context) {
 	path := filepath.Join(config.RootPath, c.Request.URL.Path)
-	fmt.Println(path)
 	info, err := os.Stat(path)
 	if err != nil {
 		c.String(404,"404 not found");
 	}else if !info.IsDir() {
+		//if c.GetHeader("If-Modified-Since") == fmt.Sprintf("%v",info.ModTime()) {
+		//	c.Status(http.StatusNotModified)
+		//	return;
+		//}
 		buf, err := ioutil.ReadFile(path)
 		if err != nil {
 			panic(err.Error())
 		}
 		c.Writer.Header().Set("Content-Type","application/octet-stream")
+		c.Writer.Header().Set("Last-Modified",fmt.Sprintf("%v",info.ModTime()))
 		c.Status(200)
 		c.Writer.Write(buf)
 	} else {
