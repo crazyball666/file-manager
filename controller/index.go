@@ -20,6 +20,7 @@ func Index(c *gin.Context) {
 	if err != nil {
 		c.String(404,"404 not found");
 	}else if !info.IsDir() {
+		c.Writer.Header().Set("Content-Type","application/octet-stream")
 		if c.GetHeader("If-Modified-Since") == fmt.Sprintf("%v",info.ModTime()) {
 			c.Status(http.StatusNotModified)
 			return;
@@ -28,8 +29,8 @@ func Index(c *gin.Context) {
 		if err != nil {
 			panic(err.Error())
 		}
-		c.Writer.Header().Set("Content-Type","application/octet-stream")
 		c.Writer.Header().Set("Last-Modified",fmt.Sprintf("%v",info.ModTime()))
+		c.Writer.Header().Set("Content-Type",http.DetectContentType(buf))
 		c.Status(200)
 		c.Writer.Write(buf)
 	} else {
