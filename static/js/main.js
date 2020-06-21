@@ -19,21 +19,25 @@ $(function () {
     })
   });
 
+  $(".back-btn").on("click",function () {
+    history.back();
+  });
+
   $(".img-view").on("click",function () {
     $(this).fadeOut()
-  })
+  });
 
   $(".close-btn").on("click",function () {
     $(this).parent().fadeOut();
-  })
+  });
 
   $("#upload-input").on("change", function (event) {
     $(".upload-form").submit()
-  })
+  });
 
   $(".create-item").on("click",function () {
     $(".create-view").fadeIn()
-  })
+  });
 
   $(".delete-btn").on("click",function () {
     var form = $("<form action='/remove' method='post'></form>")

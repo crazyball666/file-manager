@@ -18,10 +18,10 @@ func Index(c *gin.Context) {
 	path := filepath.Join(config.RootPath, c.Request.URL.Path)
 	info, err := os.Stat(path)
 	if err != nil {
-		c.String(404,"404 not found");
-	}else if !info.IsDir() {
-		c.Writer.Header().Set("Content-Type","application/octet-stream")
-		if c.GetHeader("If-Modified-Since") == fmt.Sprintf("%v",info.ModTime()) {
+		c.String(404, "404 not found");
+	} else if !info.IsDir() {
+		c.Writer.Header().Set("Content-Type", "application/octet-stream")
+		if c.GetHeader("If-Modified-Since") == fmt.Sprintf("%v", info.ModTime()) {
 			c.Status(http.StatusNotModified)
 			return;
 		}
@@ -29,15 +29,15 @@ func Index(c *gin.Context) {
 		if err != nil {
 			panic(err.Error())
 		}
-		c.Writer.Header().Set("Last-Modified",fmt.Sprintf("%v",info.ModTime()))
-		c.Writer.Header().Set("Content-Type",http.DetectContentType(buf))
+		c.Writer.Header().Set("Last-Modified", fmt.Sprintf("%v", info.ModTime()))
+		c.Writer.Header().Set("Content-Type", http.DetectContentType(buf))
 		c.Status(200)
 		c.Writer.Write(buf)
 	} else {
 		res, _ := util.ReadDir(c.Request.URL.Path)
 		c.HTML(http.StatusOK, "index.html", gin.H{
-			"basePath":c.Request.URL.Path,
-			"dirList": res,
+			"basePath": c.Request.URL.Path,
+			"dirList":  res,
 		})
 	}
 }
@@ -68,7 +68,7 @@ func Upload(c *gin.Context) {
 			panic(fmt.Sprintf("上传文件%s错误", file.Filename))
 		}
 	}
-	c.Redirect(302,basePath)
+	c.Redirect(302, basePath)
 }
 
 func UploadFile(c *gin.Context) {
@@ -85,34 +85,33 @@ func UploadFile(c *gin.Context) {
 	if len(files) < 1 {
 		panic("缺少上传文件")
 	}
-	data := make([]string,0)
+	data := make([]string, 0)
 
 	now := time.Now()
 	dateStr := now.Format("2006-01-02")
 
 	uploadDir := path.Join(config.StaticPath, config.UploadDirName, dateStr)
 	if !util.Exists(uploadDir) {
-		if err := os.MkdirAll(uploadDir,os.ModePerm);err!=nil{
+		if err := os.MkdirAll(uploadDir, os.ModePerm); err != nil {
 			panic("创建文件夹失败")
 		}
 	}
 	for _, file := range files {
-		fileName := fmt.Sprintf("%d_",now.Unix()) + file.Filename
+		fileName := fmt.Sprintf("%d_", now.Unix()) + file.Filename
 		filePath := path.Join(uploadDir, fileName)
 		err := c.SaveUploadedFile(file, filePath)
 		if err != nil {
 			panic(fmt.Sprintf("上传文件%s错误", file.Filename))
-		}else{
-			data = append(data,path.Join(config.StaticHost,config.UploadDirName,dateStr,fileName))
+		} else {
+			data = append(data, path.Join(config.StaticHost, config.UploadDirName, dateStr, fileName))
 		}
 	}
-	c.JSON(http.StatusOK,map[string]interface{}{
-		"code":200,
-		"message":"success",
-		"data":data,
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"code":    200,
+		"message": "success",
+		"data":    data,
 	})
 }
-
 
 // 创建文件夹
 func CreateDir(c *gin.Context) {
@@ -125,15 +124,15 @@ func CreateDir(c *gin.Context) {
 		}
 	}()
 	basePath := c.PostForm("basePath")
-	dirName:= c.PostForm("dirName")
+	dirName := c.PostForm("dirName")
 	if len(basePath) == 0 || len(dirName) == 0 {
 		panic("不能为空")
 	}
-	dirPath := path.Join(config.RootPath, basePath,dirName)
+	dirPath := path.Join(config.RootPath, basePath, dirName)
 	if err := os.Mkdir(dirPath, os.ModePerm); err != nil {
 		panic("创建文件夹失败: " + err.Error())
 	}
-	c.Redirect(302,basePath)
+	c.Redirect(302, basePath)
 }
 
 // 删除文件
@@ -147,14 +146,13 @@ func Delete(c *gin.Context) {
 		}
 	}()
 	basePath := c.PostForm("basePath")
-	fileName:= c.PostForm("fileName")
+	fileName := c.PostForm("fileName")
 	if len(basePath) == 0 || len(fileName) == 0 {
 		panic("不能为空")
 	}
-	fullPath := path.Join(config.RootPath, basePath,fileName)
+	fullPath := path.Join(config.RootPath, basePath, fileName)
 	if err := os.Remove(fullPath); err != nil {
 		panic("删除失败: " + err.Error())
 	}
-	c.Redirect(302,basePath)
+	c.Redirect(302, basePath)
 }
-

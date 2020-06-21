@@ -4,9 +4,25 @@ p{
 /*body{*/
 /*  padding: 20px;*/
 /*}*/
+.header{
+  width: 960px;
+  margin: 30px auto 0;
+  text-align: center;
+  overflow: hidden;
+  font-size: 18px;
+  line-height: 34px;
+  font-weight: bold;
+  color: #c9302c;
+}
+
+.back-btn{
+  float: left;
+}
+
+
 .box{
   width: 960px;
-  margin: 30px auto;
+  margin: 20px auto;
   border: 1px solid #ccc;
   padding: 30px;
   border-radius: 15px;
