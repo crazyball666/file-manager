@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"crazyball/go-common/httpServer"
 	"file-manager/config"
 	"file-manager/util"
 	"fmt"
@@ -10,11 +11,9 @@ import (
 	"path"
 	"path/filepath"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
-func Index(c *gin.Context) {
+func Index(c *httpServer.HttpContext) {
 	path := filepath.Join(config.RootPath, c.Request.URL.Path)
 	info, err := os.Stat(path)
 	if err != nil {
@@ -35,7 +34,7 @@ func Index(c *gin.Context) {
 		c.Writer.Write(buf)
 	} else {
 		res, _ := util.ReadDir(c.Request.URL.Path)
-		c.HTML(http.StatusOK, "index.html", gin.H{
+		c.HTML(http.StatusOK, "index.html", map[string]interface{}{
 			"basePath": c.Request.URL.Path,
 			"dirList":  res,
 		})
@@ -43,10 +42,10 @@ func Index(c *gin.Context) {
 }
 
 // 上传多文件
-func Upload(c *gin.Context) {
+func Upload(c *httpServer.HttpContext) {
 	defer func() {
 		if err := recover(); err != nil {
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusOK, map[string]interface{}{
 				"code":    500,
 				"message": err,
 			})
@@ -71,10 +70,10 @@ func Upload(c *gin.Context) {
 	c.Redirect(302, basePath)
 }
 
-func UploadFile(c *gin.Context) {
+func UploadFile(c *httpServer.HttpContext) {
 	defer func() {
 		if err := recover(); err != nil {
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusOK, map[string]interface{}{
 				"code":    500,
 				"message": err,
 			})
@@ -114,10 +113,10 @@ func UploadFile(c *gin.Context) {
 }
 
 // 创建文件夹
-func CreateDir(c *gin.Context) {
+func CreateDir(c *httpServer.HttpContext) {
 	defer func() {
 		if err := recover(); err != nil {
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusOK, map[string]interface{}{
 				"code":    500,
 				"message": err,
 			})
@@ -136,10 +135,10 @@ func CreateDir(c *gin.Context) {
 }
 
 // 删除文件
-func Delete(c *gin.Context) {
+func Delete(c *httpServer.HttpContext) {
 	defer func() {
 		if err := recover(); err != nil {
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusOK, map[string]interface{}{
 				"code":    500,
 				"message": err,
 			})

@@ -2,15 +2,13 @@ package main
 
 import (
 	commonController "crazyball/go-common/controller"
-	commonMiddleware "crazyball/go-common/middleware"
+	"crazyball/go-common/httpServer"
 	"file-manager/config"
 	"file-manager/controller"
 	"file-manager/util"
 	"fmt"
 	"html/template"
 	"os"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -19,29 +17,27 @@ func main() {
 		fmt.Println("[ERROR] 文件夹路径不存在")
 		panic("文件夹路径不存在")
 	}
+	// production config
+	httpServer.Mode = httpServer.HttpServerModeProduction
+	httpServer.LoggerFile = "/root/crazyball/static/logs/file-manager.log"
+	httpServer.ErrorFile = "/root/crazyball/static/logs/file-manager-error.log"
 
-	app := gin.Default()
+	server := httpServer.New()
+	server.HtmlDir = "view"
+	server.StaticDir = "static"
 
-	app.Use(commonMiddleware.Cors)
-
-	app.Static("/static", "./static")
-
-	app.SetFuncMap(template.FuncMap{
+	server.SetFuncMap(template.FuncMap{
 		"formatFileSize": util.FormatFileSize,
 		"formatTime":     util.FormatTime,
 	})
-	app.LoadHTMLGlob("view/*")
 
+	server.GET("/verify", commonController.VerifyTicket)
+	server.POST("/api/upload",controller.UploadFile)
+	server.POST("/upload", httpServer.ApiAuthMiddleware(""), controller.Upload)
+	server.POST("/mkdir", httpServer.ApiAuthMiddleware(""), controller.CreateDir)
+	server.POST("/remove", httpServer.ApiAuthMiddleware(""), controller.Delete)
 
-	app.GET("/verify", commonController.VerifyTicket)
+	server.Use(httpServer.PageAuthMiddleware(""),controller.Index)
 
-	app.POST("/api/upload",controller.UploadFile)
-
-	app.POST("/upload", commonMiddleware.AuthPage(""), controller.Upload)
-	app.POST("/mkdir", commonMiddleware.AuthPage(""), controller.CreateDir)
-	app.POST("/remove", commonMiddleware.AuthPage(""), controller.Delete)
-
-	app.Use(commonMiddleware.AuthPage(""),controller.Index)
-
-	app.Run(config.ServerPort)
+	server.Run(config.ServerPort)
 }
