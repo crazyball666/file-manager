@@ -1,78 +1,163 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="zh-cmn-Hans">
 <head>
-  <meta charset="UTF-8">
-  <title>文件系统</title>
-  <link rel="stylesheet" href="/static/css/main.css">
-  <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit"/>
+    <meta name="force-rendering" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+
+
+    <title>文件系统</title>
+    <link rel="stylesheet" href="//static.crazyball.xyz/common-resource/mdui/css/mdui.min.css"/>
+    <link rel="stylesheet" href="/static/css/main.css">
 </head>
 
-<body>
-  <div class="header">
-    <button type="button" class="back-btn btn btn-info">后退</button>
-    <div>当前路径：{{.basePath}}</div>
-  </div>
-  <div class="box">
-    {{range $i,$dir := .dirList}}
-    <div class="dir-item">
-      {{if $dir.is_dir}}
-      <img class="item-img" src="/static/img/dir.png" alt="">
-      {{else if $dir.is_img}}
-      <img class="item-img" src="{{$dir.path}}">
-      {{ else }}
-      <img class="item-img" src="/static/img/file.png" alt="">
-      {{ end }}
-      <p class="item-title">{{$dir.name}}</p>
-      {{if not $dir.is_dir}}
-      <p class="item-size">Size: {{$dir.size | formatFileSize}}</p>
-      {{end}}
-      <p class="item-time">{{$dir.modify_time | formatTime}}</p>
-      <div class="item-more-view">
-        <a class="detail-btn more-btn" attr-href="{{$dir.path}}" attr-isDir="{{$dir.is_dir}}"
-          attr-isImg="{{$dir.is_img}}">查看</a>
-        {{if not $dir.is_dir}}
-        <a class="download-btn more-btn" href="{{$dir.path}}" download>下载</a>
-        {{end}}
-        <a class="delete-btn more-btn" attr-basePath="{{$.basePath}}" attr-fileName="{{$dir.name}}">删除</a>
-      </div>
+<body class="mdui-theme-primary-blue">
+<div class="mdui-appbar mdui-appbar-fixed">
+    <div class="mdui-toolbar mdui-color-theme">
+        <a href="/" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">&#xe88a;</i></a>
+        <button class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">&#xe5c4;</i></button>
+        <div class="mdui-toolbar-spacer">
+            <div style="text-align: center">当前路径：{{.basePath}}</div>
+        </div>
+        <a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>
     </div>
-    {{end}}
-    <label class="dir-item create-item">
-      <img class="create-img" src="/static/img/add.png" alt="">
-      <p class="create-title">创建文件夹</p>
-    </label>
-    <label class="dir-item upload-item" for="upload-input">
-      <img class="upload-img" src="/static/img/upload.png" alt="">
-      <p class="upload-title">上传</p>
-      <form action="/upload" method="post" class="upload-form" enctype="multipart/form-data">
-        <input type="text" value="{{.basePath}}" name="basePath" hidden>
-        <input type="file" id="upload-input" multiple name="files">
-      </form>
-    </label>
-  </div>
+</div>
 
-  <div class="file-view" hidden>
-    <div class="close-btn"></div>
-    <div class="content-view"></div>
-  </div>
-  <div class="img-view" hidden>
-    <img class="img-content">
-  </div>
-  <div class="create-view" hidden>
-    <div class="close-btn"></div>
+<div class="mdui-panel cb-box" mdui-panel>
+    {{range $i,$dir := .dirList}}
+        <div class="mdui-panel-item">
+            <div class="mdui-panel-item-header cb-item-header">
+                {{if $dir.is_dir}}
+                    <img class="cb-item-img" src="/static/img/dir.png" alt="">
+                {{ else }}
+                    <img class="cb-item-img" src="/static/img/file.png" alt="">
+                {{ end }}
+                <div class="cb-item-title">{{$dir.name}}</div>
+                <i class="mdui-icon material-icons cb-arrow-icon">keyboard_arrow_down</i>
+            </div>
+            <div class="mdui-panel-item-body">
+                <div class="item-size">
+                    {{if not $dir.is_dir}}
+                        <p>大小：{{$dir.size | formatFileSize}}</p>
+                    {{end}}
+                    <p>修改时间：{{$dir.modify_time | formatTime}}</p>
+                </div>
+                <div class="mdui-panel-item-actions">
+                    <button class="mdui-btn mdui-ripple mdui-text-color-grey cb-item-btn" mdui-panel-item-close>取消
+                    </button>
+                    {{if not $dir.is_dir}}
+                        <a class="cb-download-btn cb-item-btn mdui-btn mdui-ripple mdui-text-color-green"
+                           href="{{$dir.path}}" download>下载</a>
+                    {{end}}
+                    <a class="cb-delete-btn cb-item-btn mdui-btn mdui-ripple mdui-text-color-red"
+                       attr-basePath="{{$.basePath}}"
+                       attr-fileName="{{$dir.name}}">删除</a>
+                </div>
+            </div>
+        </div>
+
+        {{/*                <div class="dir-item">*/}}
+        {{/*                    {{if $dir.is_dir}}*/}}
+        {{/*                        <img class="item-img" src="/static/img/dir.png" alt="">*/}}
+        {{/*                    {{else if $dir.is_img}}*/}}
+        {{/*                        <img class="item-img" src="{{$dir.path}}">*/}}
+        {{/*                    {{ else }}*/}}
+        {{/*                        <img class="item-img" src="/static/img/file.png" alt="">*/}}
+        {{/*                    {{ end }}*/}}
+        {{/*            <p class="item-title">{{$dir.name}}</p>*/}}
+        {{/*            {{if not $dir.is_dir}}*/}}
+        {{/*                <p class="item-size">Size: {{$dir.size | formatFileSize}}</p>*/}}
+        {{/*            {{end}}*/}}
+        {{/*            <p class="item-time">{{$dir.modify_time | formatTime}}</p>*/}}
+        {{/*            <div class="item-more-view">*/}}
+        {{/*                <a class="detail-btn more-btn" attr-href="{{$dir.path}}" attr-isDir="{{$dir.is_dir}}"*/}}
+        {{/*                   attr-isImg="{{$dir.is_img}}">查看</a>*/}}
+        {{/*                {{if not $dir.is_dir}}*/}}
+        {{/*                    <a class="download-btn more-btn" href="{{$dir.path}}" download>下载</a>*/}}
+        {{/*                {{end}}*/}}
+        {{/*                <a class="delete-btn more-btn" attr-basePath="{{$.basePath}}" attr-fileName="{{$dir.name}}">删除</a>*/}}
+        {{/*            </div>*/}}
+        {{/*        </div>*/}}
+    {{end}}
+    {{/*    <label class="dir-item create-item">*/}}
+    {{/*        <img class="create-img" src="/static/img/add.png" alt="">*/}}
+    {{/*        <p class="create-title">创建文件夹</p>*/}}
+    {{/*    </label>*/}}
+    {{/*    <label class="dir-item upload-item" for="upload-input">*/}}
+    {{/*        <img class="upload-img" src="/static/img/upload.png" alt="">*/}}
+    {{/*        <p class="upload-title">上传</p>*/}}
+    {{/*        <form action="/upload" method="post" class="upload-form" enctype="multipart/form-data">*/}}
+    {{/*            <input type="text" value="{{.basePath}}" name="basePath" hidden>*/}}
+    {{/*            <input type="file" id="upload-input" multiple name="files">*/}}
+    {{/*        </form>*/}}
+    {{/*    </label>*/}}
+</div>
+
+<div class="mdui-fab-wrapper" mdui-fab="{trigger: 'hover'}">
+    <button class="mdui-fab mdui-ripple mdui-color-theme">
+        <!-- 默认显示的图标 -->
+        <i class="mdui-icon material-icons">menu</i>
+
+        <!-- 在拨号菜单开始打开时，平滑切换到该图标，若不需要切换图标，则可以省略该元素 -->
+        <i class="mdui-icon mdui-fab-opened material-icons">close</i>
+    </button>
+    <div class="mdui-fab-dial">
+        <button class="mdui-fab mdui-fab-mini mdui-ripple mdui-color-pink upload-btn">
+            <label class="mdui-icon material-icons" for="upload-input">
+                backup
+            </label>
+            <form action="/upload" method="post" class="upload-form" enctype="multipart/form-data">
+                <input type="text" value="{{.basePath}}" name="basePath" hidden>
+                <input type="file" id="upload-input" multiple name="files">
+            </form>
+        </button>
+        <button class="mdui-fab mdui-fab-mini mdui-ripple mdui-color-green create-item">
+            <i class="mdui-icon material-icons">
+                create_new_folder
+            </i>
+        </button>
+    </div>
+</div>
+
+{{/*<div class="file-view" hidden>*/}}
+{{/*    <div class="close-btn"></div>*/}}
+{{/*    <div class="content-view"></div>*/}}
+{{/*</div>*/}}
+{{/*<div class="img-view" hidden>*/}}
+{{/*    <img class="img-content">*/}}
+{{/*</div>*/}}
+{{/*<div class="create-view" hidden>*/}}
+{{/*    <div class="close-btn"></div>*/}}
+{{/*    <form action="/mkdir" method="post" class="mkdir-form">*/}}
+{{/*        <input type="text" value="{{.basePath}}" name="basePath" hidden>*/}}
+{{/*        <input class="create-input" type="text" placeholder="输入文件夹名称..." name="dirName">*/}}
+{{/*        <button class="create-btn" type="submit">创建</button>*/}}
+{{/*    </form>*/}}
+{{/*</div>*/}}
+
+<div class="mdui-dialog" id="create-view">
+    <div class="mdui-dialog-title">创建文件夹</div>
     <form action="/mkdir" method="post" class="mkdir-form">
-      <input type="text" value="{{.basePath}}" name="basePath" hidden>
-      <input class="create-input" type="text" placeholder="输入文件夹名称..." name="dirName">
-      <button class="create-btn" type="submit">创建</button>
+        <div class="mdui-dialog-content">
+            <input type="text" value="{{.basePath}}" name="basePath" hidden>
+            <div class="mdui-textfield mdui-textfield-floating-label">
+                <label class="mdui-textfield-label">名称</label>
+                <input class="mdui-textfield-input create-input" type="text" name="dirName"/>
+            </div>
+        </div>
+        <div class="mdui-dialog-actions">
+            <button class="mdui-btn mdui-ripple" type="submit">Submit</button>
+        </div>
     </form>
-  </div>
+</div>
+
 
 </body>
 
-
+<script src="//static.crazyball.xyz/common-resource/mdui/js/mdui.min.js"></script>
 <script src="/static/jquery/jquery.min.js"></script>
-<script src="/static/bootstrap/js/bootstrap.js"></script>
 <script src="/static/js/main.js"></script>
 
 </html>

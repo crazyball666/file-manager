@@ -24,7 +24,7 @@ func main() {
 
 	server := httpServer.New()
 	server.HtmlDir = "view"
-	server.SetStatic("/static","./static")
+	server.SetStatic("/static", "./static")
 
 	server.SetFuncMap(template.FuncMap{
 		"formatFileSize": util.FormatFileSize,
@@ -32,12 +32,12 @@ func main() {
 	})
 
 	server.GET("/verify", commonController.VerifyTicket)
-	server.POST("/api/upload",controller.UploadFile)
+	server.POST("/api/upload", controller.UploadFile)
 	server.POST("/upload", httpServer.ApiAuthMiddleware(""), controller.Upload)
 	server.POST("/mkdir", httpServer.ApiAuthMiddleware(""), controller.CreateDir)
 	server.POST("/remove", httpServer.ApiAuthMiddleware(""), controller.Delete)
 
-	server.Use(httpServer.PageAuthMiddleware(""),controller.Index)
+	server.Use(httpServer.PageAuthMiddleware(""), controller.Index)
 
 	server.Run(config.ServerPort)
 }

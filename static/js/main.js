@@ -36,10 +36,13 @@ $(function () {
   });
 
   $(".create-item").on("click",function () {
-    $(".create-view").fadeIn()
+    console.log(111)
+    var inst = new mdui.Dialog("#create-view");
+    inst.open();
+    // $(".create-view").fadeIn()
   });
 
-  $(".delete-btn").on("click",function () {
+  $(".cb-delete-btn").on("click",function () {
     var form = $("<form action='/remove' method='post'></form>")
     form.append("<input type='hidden' name='basePath' value='" + $(this).attr("attr-basePath") +"'>");
     form.append("<input type='hidden' name='fileName' value='" + $(this).attr("attr-fileName") +"'>");
