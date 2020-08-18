@@ -24,7 +24,7 @@ func main() {
 
 	server := httpServer.New()
 	server.HtmlDir = "view"
-	server.SetStatic("/static", "./static")
+	server.SetStatic("/_static", "./static")
 
 	server.SetFuncMap(template.FuncMap{
 		"formatFileSize": util.FormatFileSize,
