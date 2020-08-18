@@ -1,6 +1,10 @@
 html {
     font-size: 0.1333333333vw;
 }
+a{
+    text-decoration: none;
+    color: black;
+}
 
 .cb-box {
     max-width: 100%;
@@ -40,6 +44,9 @@ html {
     }
 }
 
+body{
+    font-size: 14px;
+}
 
 /*.box {*/
 /*    !*width: 960px;*!*/
@@ -61,18 +68,20 @@ html {
 
 .cb-item-img {
     max-height: 80%;
-    /*width: 36rem;*/
     height: 36rem;
 }
 
 .cb-item-title {
     flex: 1;
-    font-size: 16rem;
     padding: 0 16rem;
+    font-weight: bold;
+}
+
+.cb-item-body {
+    color: #666;
 }
 
 .cb-item-btn {
-    font-size: 14rem;
     min-width: auto;
 }
 
@@ -81,28 +90,6 @@ html {
     transition: all .2s ease;
 }
 
-.dir-item:hover .item-more-view {
-    transform: translateY(0);
-}
-
-.item-more {
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-}
-
-.item-title {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.item-size {
-    font-size: 8rem;
-    color: #666;
-}
 
 .item-time {
     font-size: 10rem;

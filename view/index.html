@@ -17,7 +17,7 @@
 <div class="mdui-appbar mdui-appbar-fixed">
     <div class="mdui-toolbar mdui-color-theme">
         <a href="/" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">&#xe88a;</i></a>
-        <button class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">&#xe5c4;</i></button>
+        <button class="mdui-btn mdui-btn-icon back-btn"><i class="mdui-icon material-icons">&#xe5c4;</i></button>
         <div class="mdui-toolbar-spacer">
             <div style="text-align: center">当前路径：{{.basePath}}</div>
         </div>
@@ -34,11 +34,17 @@
                 {{ else }}
                     <img class="cb-item-img" src="/static/img/file.png" alt="">
                 {{ end }}
-                <div class="cb-item-title">{{$dir.name}}</div>
+                <div class="cb-item-title">
+                    {{if $dir.is_dir}}
+                        <a href="{{$dir.path}}">{{$dir.name}}</a>
+                    {{else}}
+                        <span>{{$dir.name}}</span>
+                    {{end}}
+                </div>
                 <i class="mdui-icon material-icons cb-arrow-icon">keyboard_arrow_down</i>
             </div>
             <div class="mdui-panel-item-body">
-                <div class="item-size">
+                <div class="cb-item-body">
                     {{if not $dir.is_dir}}
                         <p>大小：{{$dir.size | formatFileSize}}</p>
                     {{end}}
@@ -47,6 +53,8 @@
                 <div class="mdui-panel-item-actions">
                     <button class="mdui-btn mdui-ripple mdui-text-color-grey cb-item-btn" mdui-panel-item-close>取消
                     </button>
+                    <a class="cb-delete-btn cb-item-btn mdui-btn mdui-ripple mdui-text-color-blue"
+                       href="{{$dir.path}}">查看</a>
                     {{if not $dir.is_dir}}
                         <a class="cb-download-btn cb-item-btn mdui-btn mdui-ripple mdui-text-color-green"
                            href="{{$dir.path}}" download>下载</a>
@@ -57,42 +65,7 @@
                 </div>
             </div>
         </div>
-
-        {{/*                <div class="dir-item">*/}}
-        {{/*                    {{if $dir.is_dir}}*/}}
-        {{/*                        <img class="item-img" src="/static/img/dir.png" alt="">*/}}
-        {{/*                    {{else if $dir.is_img}}*/}}
-        {{/*                        <img class="item-img" src="{{$dir.path}}">*/}}
-        {{/*                    {{ else }}*/}}
-        {{/*                        <img class="item-img" src="/static/img/file.png" alt="">*/}}
-        {{/*                    {{ end }}*/}}
-        {{/*            <p class="item-title">{{$dir.name}}</p>*/}}
-        {{/*            {{if not $dir.is_dir}}*/}}
-        {{/*                <p class="item-size">Size: {{$dir.size | formatFileSize}}</p>*/}}
-        {{/*            {{end}}*/}}
-        {{/*            <p class="item-time">{{$dir.modify_time | formatTime}}</p>*/}}
-        {{/*            <div class="item-more-view">*/}}
-        {{/*                <a class="detail-btn more-btn" attr-href="{{$dir.path}}" attr-isDir="{{$dir.is_dir}}"*/}}
-        {{/*                   attr-isImg="{{$dir.is_img}}">查看</a>*/}}
-        {{/*                {{if not $dir.is_dir}}*/}}
-        {{/*                    <a class="download-btn more-btn" href="{{$dir.path}}" download>下载</a>*/}}
-        {{/*                {{end}}*/}}
-        {{/*                <a class="delete-btn more-btn" attr-basePath="{{$.basePath}}" attr-fileName="{{$dir.name}}">删除</a>*/}}
-        {{/*            </div>*/}}
-        {{/*        </div>*/}}
     {{end}}
-    {{/*    <label class="dir-item create-item">*/}}
-    {{/*        <img class="create-img" src="/static/img/add.png" alt="">*/}}
-    {{/*        <p class="create-title">创建文件夹</p>*/}}
-    {{/*    </label>*/}}
-    {{/*    <label class="dir-item upload-item" for="upload-input">*/}}
-    {{/*        <img class="upload-img" src="/static/img/upload.png" alt="">*/}}
-    {{/*        <p class="upload-title">上传</p>*/}}
-    {{/*        <form action="/upload" method="post" class="upload-form" enctype="multipart/form-data">*/}}
-    {{/*            <input type="text" value="{{.basePath}}" name="basePath" hidden>*/}}
-    {{/*            <input type="file" id="upload-input" multiple name="files">*/}}
-    {{/*        </form>*/}}
-    {{/*    </label>*/}}
 </div>
 
 <div class="mdui-fab-wrapper" mdui-fab="{trigger: 'hover'}">
