@@ -5,7 +5,6 @@ import (
 	"file-manager/config"
 	"file-manager/util"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -14,24 +13,16 @@ import (
 )
 
 func Index(c *httpServer.HttpContext) {
-	path := filepath.Join(config.RootPath, c.Request.URL.Path)
-	info, err := os.Stat(path)
+	fullpath := filepath.Join(config.RootPath, c.Request.URL.Path)
+	info, err := os.Stat(fullpath)
 	if err != nil {
 		c.String(404, "404 not found");
 	} else if !info.IsDir() {
-		c.Writer.Header().Set("Content-Type", "application/octet-stream")
-		if c.GetHeader("If-Modified-Since") == fmt.Sprintf("%v", info.ModTime()) {
-			c.Status(http.StatusNotModified)
-			return;
-		}
-		buf, err := ioutil.ReadFile(path)
+		file, err := os.Open(fullpath)
 		if err != nil {
-			panic(err.Error())
+			c.Error("open file is error");
 		}
-		c.Writer.Header().Set("Last-Modified", fmt.Sprintf("%v", info.ModTime()))
-		c.Writer.Header().Set("Content-Type", http.DetectContentType(buf))
-		c.Status(200)
-		c.Writer.Write(buf)
+		http.ServeContent(c.Writer, c.Request, fullpath, info.ModTime(), file)
 	} else {
 		res, _ := util.ReadDir(c.Request.URL.Path)
 		c.HTML(http.StatusOK, "index.html", map[string]interface{}{
@@ -41,35 +32,7 @@ func Index(c *httpServer.HttpContext) {
 	}
 }
 
-// 上传多文件
-func Upload(c *httpServer.HttpContext) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusOK, map[string]interface{}{
-				"code":    500,
-				"message": err,
-			})
-		}
-	}()
-	form, _ := c.MultipartForm()
-	basePath := c.PostForm("basePath")
-	if basePath == "" {
-		panic("缺少上传Path")
-	}
-	files := form.File["files"]
-	if len(files) < 1 {
-		panic("缺少上传文件")
-	}
-	for _, file := range files {
-		filePath := path.Join(config.RootPath, basePath, file.Filename)
-		err := c.SaveUploadedFile(file, filePath)
-		if err != nil {
-			panic(fmt.Sprintf("上传文件%s错误", file.Filename))
-		}
-	}
-	c.Redirect(302, basePath)
-}
-
+// 上传多文件【通用接口】
 func UploadFile(c *httpServer.HttpContext) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -110,6 +73,34 @@ func UploadFile(c *httpServer.HttpContext) {
 		"message": "success",
 		"data":    data,
 	})
+}
+
+func Upload(c *httpServer.HttpContext) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusOK, map[string]interface{}{
+				"code":    500,
+				"message": err,
+			})
+		}
+	}()
+	form, _ := c.MultipartForm()
+	basePath := c.PostForm("basePath")
+	if basePath == "" {
+		panic("缺少上传Path")
+	}
+	files := form.File["files"]
+	if len(files) < 1 {
+		panic("缺少上传文件")
+	}
+	for _, file := range files {
+		filePath := path.Join(config.RootPath, basePath, file.Filename)
+		err := c.SaveUploadedFile(file, filePath)
+		if err != nil {
+			panic(fmt.Sprintf("上传文件%s错误", file.Filename))
+		}
+	}
+	c.Redirect(302, basePath)
 }
 
 // 创建文件夹
@@ -154,4 +145,27 @@ func Delete(c *httpServer.HttpContext) {
 		panic("删除失败: " + err.Error())
 	}
 	c.Redirect(302, basePath)
+}
+
+// 查看文件内容接口
+func GetFileContent(c *httpServer.HttpContext) {
+	relativePath := c.Query("path")
+	fullPath := filepath.Join(config.RootPath, relativePath)
+	info, err := os.Stat(fullPath)
+	if err != nil {
+		c.Error("file is not exist");
+	} else if info.IsDir() {
+		c.Error("file is dir");
+	} else {
+		if info.Size() > 5 *1024*1024 {
+			c.Error("file size is larger than 5 mb")
+			return
+		}
+		file, err := os.Open(fullPath)
+		if err != nil {
+			c.Error("open file is error");
+			return
+		}
+		http.ServeContent(c.Writer, c.Request, fullPath, info.ModTime(), file)
+	}
 }

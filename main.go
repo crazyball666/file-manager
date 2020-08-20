@@ -31,8 +31,11 @@ func main() {
 		"formatTime":     util.FormatTime,
 	})
 
-	server.GET("/verify", commonController.VerifyTicket)
 	server.POST("/api/upload", controller.UploadFile)
+
+	server.GET("/verify", commonController.VerifyTicket)
+
+	server.GET("/getFileDetail", httpServer.ApiAuthMiddleware(""), controller.GetFileContent)
 	server.POST("/upload", httpServer.ApiAuthMiddleware(""), controller.Upload)
 	server.POST("/mkdir", httpServer.ApiAuthMiddleware(""), controller.CreateDir)
 	server.POST("/remove", httpServer.ApiAuthMiddleware(""), controller.Delete)
