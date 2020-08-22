@@ -100,7 +100,7 @@ func Upload(c *httpServer.HttpContext) {
 			panic(fmt.Sprintf("上传文件%s错误", file.Filename))
 		}
 	}
-	c.Redirect(302, basePath)
+	c.Success(nil)
 }
 
 // 创建文件夹
@@ -127,24 +127,18 @@ func CreateDir(c *httpServer.HttpContext) {
 
 // 删除文件
 func Delete(c *httpServer.HttpContext) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusOK, map[string]interface{}{
-				"code":    500,
-				"message": err,
-			})
-		}
-	}()
-	basePath := c.PostForm("basePath")
-	fileName := c.PostForm("fileName")
-	if len(basePath) == 0 || len(fileName) == 0 {
-		panic("不能为空")
+	filePath := c.Query("path")
+	fmt.Println(c.Query("path"))
+	if len(filePath) == 0 {
+		c.Error("路径不能为空")
+		return
 	}
-	fullPath := path.Join(config.RootPath, basePath, fileName)
+	fullPath := path.Join(config.RootPath, filePath)
 	if err := os.Remove(fullPath); err != nil {
-		panic("删除失败: " + err.Error())
+		c.Error("删除失败: " + err.Error())
+		return
 	}
-	c.Redirect(302, basePath)
+	c.Success(nil);
 }
 
 // 查看文件内容接口
@@ -157,7 +151,7 @@ func GetFileContent(c *httpServer.HttpContext) {
 	} else if info.IsDir() {
 		c.Error("file is dir");
 	} else {
-		if info.Size() > 5 *1024*1024 {
+		if info.Size() > 5*1024*1024 {
 			c.Error("file size is larger than 5 mb")
 			return
 		}

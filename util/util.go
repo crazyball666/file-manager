@@ -4,9 +4,10 @@ import (
 	"file-manager/config"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
+	"strings"
 	"time"
 )
 
@@ -31,7 +32,10 @@ func ReadDir(dir string) ([]*FileModel, error) {
 	}
 	var fileSlice []*FileModel
 	for _, fileInfo := range fileInfos {
-		isImg, _ := regexp.MatchString("\\.(jpg|jpeg|bmp|png)$", fileInfo.Name())
+		isImg := false;
+		if !fileInfo.IsDir() {
+			isImg = CheckFileIsImage(filepath.Join(fullPath, fileInfo.Name()))
+		}
 		file := &FileModel{
 			filepath.Join(dir, fileInfo.Name()),
 			fileInfo.Name(),
@@ -46,6 +50,26 @@ func ReadDir(dir string) ([]*FileModel, error) {
 		fileSlice = append(fileSlice, file)
 	}
 	return fileSlice, nil
+}
+
+func CheckFileIsImage(filePath string) bool {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+	buffer := make([]byte, 512)
+
+	_, err = f.Read(buffer)
+	if err != nil {
+		return false
+	}
+
+	contentType := http.DetectContentType(buffer)
+	if strings.Contains(contentType, "image") {
+		return true
+	}
+	return false
 }
 
 func Exists(path string) bool {

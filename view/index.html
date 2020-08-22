@@ -10,6 +10,7 @@
 
     <title>文件系统</title>
     <link rel="stylesheet" href="//static.crazyball.xyz/common-resource/mdui/css/mdui.min.css"/>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/monokai.min.css">
     <link rel="stylesheet" href="/_static/css/main.css">
 </head>
 
@@ -56,20 +57,20 @@
                     </button>
                     {{if not $dir.IsDir}}
                         <button class="cb-detail-btn cb-item-btn mdui-btn mdui-ripple mdui-text-color-blue"
-                                attr-href="{{$dir.Path}}" attr-size="{{$dir.Size}}">查看
+                                attr-href="{{$dir.Path}}" attr-size="{{$dir.Size}}" attr-isImg="{{$dir.IsImg}}">查看
                         </button>
                         <a class="cb-download-btn cb-item-btn mdui-btn mdui-ripple mdui-text-color-green"
                            href="{{$dir.Path}}" download>下载</a>
                     {{end}}
                     <a class="cb-delete-btn cb-item-btn mdui-btn mdui-ripple mdui-text-color-red"
-                       attr-basePath="{{$.basePath}}"
-                       attr-fileName="{{$dir.Name}}">删除</a>
+                       attr-filePath="{{$dir.Path}}">删除</a>
                 </div>
             </div>
         </div>
     {{end}}
 </div>
 
+{{/*悬浮按钮*/}}
 <div class="mdui-fab-wrapper" mdui-fab="{trigger: 'hover'}">
     <button class="mdui-fab mdui-ripple mdui-color-theme">
         <!-- 默认显示的图标 -->
@@ -95,6 +96,7 @@
     </div>
 </div>
 
+{{/*创建文件夹*/}}
 <div class="mdui-dialog" id="cb-create-view">
     <div class="mdui-dialog-title">创建文件夹</div>
     <form action="/mkdir" method="post" class="mkdir-form">
@@ -111,14 +113,38 @@
     </form>
 </div>
 
-
+{{/*查看内容*/}}
 <div class="mdui-dialog" id="cb-content-view">
+    <pre><code></code></pre>
 </div>
+
+{{/*查看图片*/}}
+<div class="mdui-dialog" id="cb-img-view">
+    <img src="">
+</div>
+
+{{/*删除提示*/}}
+<div class="mdui-dialog" id="cb-remove-tips">
+    <div class="mdui-dialog-content">是否删除该项？</div>
+    <div class="mdui-dialog-actions">
+        <button class="mdui-btn mdui-ripple" mdui-dialog-close>取消</button>
+        <button class="mdui-btn mdui-ripple cb-delete-confirm">确定</button>
+    </div>
+</div>
+
+{{/*loading*/}}
+<div class="mdui-dialog" id="cb-loading-view">
+    <div class="mdui-progress">
+        <div class="mdui-progress-determinate"></div>
+    </div>
+</div>
+
 
 </body>
 
-<script src="//static.crazyball.xyz/common-resource/mdui/js/mdui.min.js"></script>
 <script src="/_static/jquery/jquery.min.js"></script>
+<script src="//static.crazyball.xyz/common-resource/mdui/js/mdui.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script>
 <script src="/_static/js/main.js"></script>
 
 </html>

@@ -38,7 +38,7 @@ func main() {
 	server.GET("/getFileDetail", httpServer.ApiAuthMiddleware(""), controller.GetFileContent)
 	server.POST("/upload", httpServer.ApiAuthMiddleware(""), controller.Upload)
 	server.POST("/mkdir", httpServer.ApiAuthMiddleware(""), controller.CreateDir)
-	server.POST("/remove", httpServer.ApiAuthMiddleware(""), controller.Delete)
+	server.GET("/remove", httpServer.ApiAuthMiddleware(""), controller.Delete)
 
 	server.Use(httpServer.PageAuthMiddleware(""), controller.Index)
 
