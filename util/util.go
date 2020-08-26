@@ -11,6 +11,14 @@ import (
 	"time"
 )
 
+type FileType uint32
+
+const (
+	FileTypeUnknown FileType = 0
+	FileTypeImage FileType = 1
+	FileTypeVideo FileType = 2
+)
+
 type FileModel struct {
 	Path       string
 	Name       string
@@ -21,6 +29,7 @@ type FileModel struct {
 	ModTimeStr string
 	IsDir      bool
 	IsImg      bool
+	IsVideo    bool
 }
 
 // 读取文件夹
@@ -32,9 +41,15 @@ func ReadDir(dir string) ([]*FileModel, error) {
 	}
 	var fileSlice []*FileModel
 	for _, fileInfo := range fileInfos {
-		isImg := false;
+		isImg := false
+		isVideo := false
 		if !fileInfo.IsDir() {
-			isImg = CheckFileIsImage(filepath.Join(fullPath, fileInfo.Name()))
+			fileType := CheckFileType(filepath.Join(fullPath, fileInfo.Name()))
+			if fileType == FileTypeImage {
+				isImg = true;
+			} else if (fileType == FileTypeVideo) {
+				isVideo = true
+			}
 		}
 		file := &FileModel{
 			filepath.Join(dir, fileInfo.Name()),
@@ -46,30 +61,33 @@ func ReadDir(dir string) ([]*FileModel, error) {
 			FormatTime(fileInfo.ModTime()),
 			fileInfo.IsDir(),
 			isImg,
+			isVideo,
 		}
 		fileSlice = append(fileSlice, file)
 	}
 	return fileSlice, nil
 }
 
-func CheckFileIsImage(filePath string) bool {
+func CheckFileType(filePath string) FileType {
 	f, err := os.Open(filePath)
 	if err != nil {
-		return false
+		return FileTypeUnknown
 	}
 	defer f.Close()
 	buffer := make([]byte, 512)
 
 	_, err = f.Read(buffer)
 	if err != nil {
-		return false
+		return FileTypeUnknown
 	}
-
 	contentType := http.DetectContentType(buffer)
 	if strings.Contains(contentType, "image") {
-		return true
+		return FileTypeImage
 	}
-	return false
+	if strings.Contains(contentType, "video") {
+		return FileTypeVideo
+	}
+	return FileTypeUnknown
 }
 
 func Exists(path string) bool {

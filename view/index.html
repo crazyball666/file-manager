@@ -57,7 +57,8 @@
                     </button>
                     {{if not $dir.IsDir}}
                         <button class="cb-detail-btn cb-item-btn mdui-btn mdui-ripple mdui-text-color-blue"
-                                attr-href="{{$dir.Path}}" attr-size="{{$dir.Size}}" attr-isImg="{{$dir.IsImg}}">查看
+                                attr-href="{{$dir.Path}}" attr-size="{{$dir.Size}}" attr-isImg="{{$dir.IsImg}}"
+                                attr-isVideo="{{$dir.IsVideo}}">查看
                         </button>
                         <a class="cb-download-btn cb-item-btn mdui-btn mdui-ripple mdui-text-color-green"
                            href="{{$dir.Path}}" download>下载</a>
@@ -120,7 +121,6 @@
 
 {{/*查看图片*/}}
 <div class="mdui-dialog" id="cb-img-view">
-    <img src="">
 </div>
 
 {{/*删除提示*/}}
@@ -137,6 +137,16 @@
     <div class="mdui-progress">
         <div class="mdui-progress-determinate"></div>
     </div>
+</div>
+
+{{/*global-loading*/}}
+<div class="mdui-dialog" id="cb-global-loading-view">
+    <div class="mdui-progress">
+        <div class="mdui-progress-indeterminate"></div>
+    </div>
+</div>
+
+<div class="mdui-dialog" id="cb-video-view">
 </div>
 
 

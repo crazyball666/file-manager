@@ -151,7 +151,8 @@ func GetFileContent(c *httpServer.HttpContext) {
 	} else if info.IsDir() {
 		c.Error("file is dir");
 	} else {
-		if info.Size() > 5*1024*1024 {
+		fileType := util.CheckFileType(fullPath)
+		if info.Size() > 5*1024*1024 && fileType == util.FileTypeUnknown {
 			c.Error("file size is larger than 5 mb")
 			return
 		}

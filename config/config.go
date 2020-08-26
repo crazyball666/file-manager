@@ -1,7 +1,7 @@
 package config
 
 var (
-	ServerPort    int    = 8080 //端口号
+	ServerPort int = 8080 //端口号
 	//RootPath      string = "/Users/crazyball"
 	RootPath      string = "/root/crazyball"        // 根路径
 	UploadDirName string = "uploads"                // 上传文件夹

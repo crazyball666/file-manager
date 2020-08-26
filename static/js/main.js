@@ -1,20 +1,32 @@
 $(function () {
+    $("#cb-img-view").on("closed.mdui.dialog", function () {
+        $("#cb-img-view").html("");
+    });
+    $("#cb-video-view").on("closed.mdui.dialog", function () {
+        $("#cb-video-view").html("");
+    });
+    $("#cb-content-view").on("closed.mdui.dialog", function () {
+        $("#cb-content-view pre code").text("");
+    });
+
     $(".cb-detail-btn").on('click', function (event) {
         event.preventDefault();
 
         let isImg = $(this).attr("attr-isImg");
-
-        var size = parseInt($(this).attr("attr-size"));
-        if (size > 5 * 1024 * 1024) {
-            toast("文件不能超过5M");
-            return;
-        }
+        let isVideo = $(this).attr("attr-isVideo");
 
         let path = "/getFileDetail?path=" + $(this).attr("attr-href");
 
+        var loadinginst = new mdui.Dialog("#cb-global-loading-view", {modal: true,});
+        loadinginst.open();
+
         if (isImg === "true") {
             let img = new Image();
+            img.onerror = function () {
+                loadinginst.close();
+            };
             img.onload = function () {
+                loadinginst.close();
                 $("#cb-img-view").html(img);
                 var inst = new mdui.Dialog("#cb-img-view");
                 inst.open();
@@ -22,8 +34,24 @@ $(function () {
             img.src = path;
             return
         }
+        if (isVideo === "true") {
+            loadinginst.close();
+            $("#cb-video-view").append(`<video src="${path}" controls="controls"></video>`);
+            var inst = new mdui.Dialog("#cb-video-view");
+            inst.open();
+            return;
+        }
+
+
+        var size = parseInt($(this).attr("attr-size"));
+        if (size > 5 * 1024 * 1024) {
+            toast("文件不能超过5M");
+            loadinginst.close();
+            return;
+        }
 
         $.get(path, function (data) {
+            loadinginst.close();
             if (data.code === -1000) {
                 toast(data.message);
                 return
