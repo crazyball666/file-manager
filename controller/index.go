@@ -1,7 +1,8 @@
 package controller
 
 import (
-	"crazyball/go-common/httpServer"
+	"crazyball/go-common/CBServer"
+	"crazyball/go-common/crypt"
 	"file-manager/config"
 	"file-manager/util"
 	"fmt"
@@ -9,10 +10,11 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"time"
 )
 
-func Index(c *httpServer.HttpContext) {
+func FileListPage(c *CBServer.CBContext) {
 	fullpath := filepath.Join(config.RootPath, c.Request.URL.Path)
 	info, err := os.Stat(fullpath)
 	if err != nil {
@@ -20,7 +22,8 @@ func Index(c *httpServer.HttpContext) {
 	} else if !info.IsDir() {
 		file, err := os.Open(fullpath)
 		if err != nil {
-			c.Error("open file is error");
+			c.Fail("open file is error");
+			return
 		}
 		http.ServeContent(c.Writer, c.Request, fullpath, info.ModTime(), file)
 	} else {
@@ -33,29 +36,23 @@ func Index(c *httpServer.HttpContext) {
 }
 
 // 上传多文件【通用接口】
-func UploadFile(c *httpServer.HttpContext) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusOK, map[string]interface{}{
-				"code":    500,
-				"message": err,
-			})
-		}
-	}()
+func UploadFile(c *CBServer.CBContext) {
 	form, _ := c.MultipartForm()
 	files := form.File["files"]
 	if len(files) < 1 {
-		panic("缺少上传文件")
+		c.Fail("缺少上传文件")
+		return
 	}
 	data := make([]string, 0)
 
 	now := time.Now()
 	dateStr := now.Format("2006-01-02")
 
-	uploadDir := path.Join(config.StaticPath, config.UploadDirName, dateStr)
+	uploadDir := path.Join(config.RootPath, config.StaticDirName, config.UploadDirName, dateStr)
 	if !util.Exists(uploadDir) {
 		if err := os.MkdirAll(uploadDir, os.ModePerm); err != nil {
-			panic("创建文件夹失败")
+			c.Fail("创建文件夹失败")
+			return
 		}
 	}
 	for _, file := range files {
@@ -63,19 +60,56 @@ func UploadFile(c *httpServer.HttpContext) {
 		filePath := path.Join(uploadDir, fileName)
 		err := c.SaveUploadedFile(file, filePath)
 		if err != nil {
-			panic(fmt.Sprintf("上传文件%s错误", file.Filename))
+			c.Fail(fmt.Sprintf("上传文件%s错误", file.Filename))
+			return
 		} else {
 			data = append(data, path.Join(config.StaticHost, config.UploadDirName, dateStr, fileName))
 		}
 	}
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"code":    200,
-		"message": "success",
-		"data":    data,
-	})
+	c.Success(data)
 }
 
-func Upload(c *httpServer.HttpContext) {
+// 上传临时文件
+func UploadTempFile(c *CBServer.CBContext) {
+	form, _ := c.MultipartForm()
+	files := form.File["files"]
+	if len(files) < 1 {
+		c.Fail("缺少上传文件")
+		return
+	}
+
+	type uploadRes struct {
+		Path string `json:"path"`
+	}
+
+	data := make([]*uploadRes, 0)
+	now := time.Now()
+	dateStr := now.Format("2006-01-02")
+
+	uploadDir := path.Join(config.RootPath, config.TempDirName, dateStr)
+	if !util.Exists(uploadDir) {
+		if err := os.MkdirAll(uploadDir, os.ModePerm); err != nil {
+			c.Fail("创建文件夹失败")
+			return
+		}
+	}
+	for _, file := range files {
+		fileName := crypt.MD5([]byte(strconv.Itoa(int(now.Unix()))))
+		filePath := path.Join(uploadDir, fileName)
+		err := c.SaveUploadedFile(file, filePath)
+		if err != nil {
+			c.Fail(fmt.Sprintf("上传文件%s错误", file.Filename))
+			return
+		} else {
+			data = append(data, &uploadRes{
+				Path: path.Join("/", uploadDir, fileName),
+			})
+		}
+	}
+	c.Success(data)
+}
+
+func Upload(c *CBServer.CBContext) {
 	defer func() {
 		if err := recover(); err != nil {
 			c.JSON(http.StatusOK, map[string]interface{}{
@@ -104,7 +138,7 @@ func Upload(c *httpServer.HttpContext) {
 }
 
 // 创建文件夹
-func CreateDir(c *httpServer.HttpContext) {
+func CreateDir(c *CBServer.CBContext) {
 	defer func() {
 		if err := recover(); err != nil {
 			c.JSON(http.StatusOK, map[string]interface{}{
@@ -126,39 +160,39 @@ func CreateDir(c *httpServer.HttpContext) {
 }
 
 // 删除文件
-func Delete(c *httpServer.HttpContext) {
+func Delete(c *CBServer.CBContext) {
 	filePath := c.Query("path")
 	fmt.Println(c.Query("path"))
 	if len(filePath) == 0 {
-		c.Error("路径不能为空")
+		c.Fail("路径不能为空")
 		return
 	}
 	fullPath := path.Join(config.RootPath, filePath)
 	if err := os.Remove(fullPath); err != nil {
-		c.Error("删除失败: " + err.Error())
+		c.Fail("删除失败: " + err.Error())
 		return
 	}
 	c.Success(nil);
 }
 
 // 查看文件内容接口
-func GetFileContent(c *httpServer.HttpContext) {
+func GetFileContent(c *CBServer.CBContext) {
 	relativePath := c.Query("path")
 	fullPath := filepath.Join(config.RootPath, relativePath)
 	info, err := os.Stat(fullPath)
 	if err != nil {
-		c.Error("file is not exist");
+		c.Fail("file is not exist");
 	} else if info.IsDir() {
-		c.Error("file is dir");
+		c.Fail("file is dir");
 	} else {
 		fileType := util.CheckFileType(fullPath)
 		if info.Size() > 5*1024*1024 && fileType == util.FileTypeUnknown {
-			c.Error("file size is larger than 5 mb")
+			c.Fail("file size is larger than 5 mb")
 			return
 		}
 		file, err := os.Open(fullPath)
 		if err != nil {
-			c.Error("open file is error");
+			c.Fail("open file is error");
 			return
 		}
 		http.ServeContent(c.Writer, c.Request, fullPath, info.ModTime(), file)

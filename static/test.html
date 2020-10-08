@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件系统测试页</title>
+    <style>
+        .progress {
+            width: 300px;
+            height: 20px;
+            border: 1px solid hotpink;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .step {
+            height: 20px;
+            width: 0;
+            background: greenyellow;
+        }
+    </style>
+</head>
+
+<body>
+<div class='progress'>
+    <div class="step"></div>
+</div>
+<div id="result"></div>
+<div>
+    <h2>上传文件</h2>
+    <div>
+        <input type="file" id="file"/>
+        <input type="button" onclick="UploadFile()" value="上传"/>
+    </div>
+    <hr/>
+</div>
+
+<div>
+    <h2>上传临时文件</h2>
+    <div>
+        <input type="file" id="tempFile"/>
+        <input type="button" onclick="UploadTempFile()" value="上传"/>
+    </div>
+    <hr/>
+</div>
+</body>
+
+<script>
+    function UploadFile() {
+        var fileObj = document.getElementById("file").files[0]; // 获取文件对象
+        var FileController = "/api/upload"; // 接收上传文件的后台地址
+        // FormData 对象
+        var form = new FormData();
+        form.append("files", fileObj); // 文件对象
+        // XMLHttpRequest 对象
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", FileController, true);
+        xhr.onload = function (res) {
+            if (xhr.status == 200) {
+                console.log(xhr.responseText)
+                var result = JSON.parse(xhr.responseText);
+                if (result.code == 1000) {
+                    let resultStr = ""
+                    for (let i = 0; i < result.data.length; i++) {
+                        resultStr += "<p>地址：" + result.data[i] + "</p>"
+                    }
+                    document.querySelector('#result').innerHTML = resultStr;
+                    alert("上传成功")
+                    return
+                }
+                alert("上传失败")
+            }
+
+        };
+        xhr.onerror = function () {
+            alert("上传失败")
+        };
+        xhr.upload.onprogress = function (event) {
+            var percent = event.loaded / event.total * 100 + '%';
+            console.log(percent);
+            document.querySelector('.step').style.width = percent;
+        };
+        xhr.send(form);
+    }
+
+    function UploadTempFile() {
+        var fileObj = document.getElementById("tempFile").files[0]; // 获取文件对象
+        var FileController = "/api/temp/upload"; // 接收上传文件的后台地址
+        // FormData 对象
+        var form = new FormData();
+        form.append("files", fileObj); // 文件对象
+        // XMLHttpRequest 对象
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", FileController, true);
+        xhr.onload = function (res) {
+            if (xhr.status === 200) {
+                console.log(xhr.responseText)
+                var result = JSON.parse(xhr.responseText);
+                if (result.code === 1000) {
+                    let resultStr = "";
+                    for (let i = 0; i < result.data.length; i++) {
+                        resultStr += "<p>地址：" + JSON.stringify(result.data[i]) + "</p>"
+                    }
+                    document.querySelector('#result').innerHTML = resultStr;
+                    alert("上传成功");
+                    return
+                }
+                alert("上传失败")
+            }
+
+        };
+        xhr.onerror = function () {
+            alert("上传失败")
+        };
+        xhr.upload.onprogress = function (event) {
+            document.querySelector('.step').style.width = event.loaded / event.total * 100 + '%';
+        };
+        xhr.send(form);
+    }
+</script>
+
+</html>
