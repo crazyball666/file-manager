@@ -4,6 +4,7 @@ import (
 	"crazyball/go-common/CBServer"
 	"file-manager/config"
 	"file-manager/router"
+	_ "file-manager/schedule"
 	"fmt"
 	"os"
 )
