@@ -20,6 +20,8 @@ func UseRoute(app *CBServer.Server) {
 
 	app.GET("/verify", publicController.VerifyTicket)
 
+	app.Use(publicMiddleware.VerifyRoute("file"))
+
 	// 通用接口
 	app.POST("/api/upload", CBServer.WithCBContext(controller.UploadFile))
 	app.POST("/api/temp/upload", CBServer.WithCBContext(controller.UploadTempFile))
@@ -27,27 +29,22 @@ func UseRoute(app *CBServer.Server) {
 	/// 文件系统操作接口
 	app.GET(
 		"/getFileDetail",
-		publicMiddleware.PageAuthMiddleware(""),
 		CBServer.WithCBContext(controller.GetFileContent),
 	)
 	app.POST(
 		"/upload",
-		publicMiddleware.PageAuthMiddleware(""),
 		CBServer.WithCBContext(controller.Upload),
 	)
 	app.POST(
 		"/mkdir",
-		publicMiddleware.PageAuthMiddleware(""),
 		CBServer.WithCBContext(controller.CreateDir), )
 	app.GET(
 		"/remove",
-		publicMiddleware.PageAuthMiddleware(""),
 		CBServer.WithCBContext(controller.Delete),
 	)
 
 	/// 文件列表页面
 	app.Use(
-		publicMiddleware.PageAuthMiddleware(""),
 		CBServer.WithCBContext(controller.FileListPage),
 	)
 }
