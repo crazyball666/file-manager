@@ -18,7 +18,7 @@ func UseRoute(app *CBServer.Server) {
 	app.Static("/_static", "./static")
 	app.LoadHTMLGlob("./view/*")
 
-	app.GET("/verify", publicController.VerifyTicket)
+	app.GET("/verify", publicController.AcceptAccessToken)
 
 	app.Use(publicMiddleware.VerifyRoute("file"))
 
